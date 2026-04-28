@@ -33,6 +33,8 @@ import {
   Sparkles, 
   Cpu, 
   Layers,
+  Activity,
+  Zap,
   ChevronRight,
   User as UserIcon,
   ShieldCheck
@@ -65,6 +67,8 @@ export default function App() {
   const [showDevPanel, setShowDevPanel] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [uiLevel, setUiLevel] = useState(1);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [metrics, setMetrics] = useState({ cpu: 12, memory: 45, latency: 18 });
   const [activeNodes, setActiveNodes] = useState<CoreNode[]>([
     { id: '1', label: 'Neural Alpha', status: 'active' },
     { id: '2', label: 'Logic Beta', status: 'active' },
@@ -72,6 +76,17 @@ export default function App() {
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
   const [loginError, setLoginError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   useEffect(() => {
     testConnection();
@@ -116,7 +131,19 @@ export default function App() {
         status: Math.random() > 0.8 ? 'syncing' : 'active'
       })));
     }, 5000);
-    return () => clearInterval(interval);
+    // Simulate "Real-time" metrics
+    const metricsInterval = setInterval(() => {
+      setMetrics({
+        cpu: Math.floor(Math.random() * 20) + 5,
+        memory: Math.floor(Math.random() * 10) + 40,
+        latency: Math.floor(Math.random() * 15) + 10
+      });
+    }, 3000);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(metricsInterval);
+    };
   };
 
   useEffect(() => {
@@ -132,6 +159,17 @@ export default function App() {
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsProcessing(true);
+
+    if (!isOnline) {
+      const offlineMsg: Message = { 
+        id: Date.now().toString(), 
+        role: 'model', 
+        content: `Synchronization interrupted, tovinnn. Connection to the Neural Cloud is unavailable. Local subsystems are active, and I have perfect recall of our previous data, but I cannot perform new high-level synthesis until we are back online.`
+      };
+      setMessages(prev => [...prev, offlineMsg]);
+      setIsProcessing(false);
+      return;
+    }
 
     try {
       const response = await generateAiResponse(
@@ -265,7 +303,12 @@ export default function App() {
                 </div>
                 <div className="flex flex-col">
                   <span className="font-bold tracking-widest text-xs">NEXUS PRIME</span>
-                  <span className="text-[8px] text-nexus-accent font-mono">NEURAL CORE ACTIVE</span>
+                  <div className="flex items-center gap-1">
+                    <div className={cn("w-1 h-1 rounded-full", isOnline ? "bg-nexus-accent shadow-[0_0_5px_rgba(0,240,255,0.8)]" : "bg-red-500 animate-pulse")} />
+                    <span className="text-[8px] text-nexus-accent font-mono">
+                      {isOnline ? `NEURAL CORE L${uiLevel} ACTIVE` : "OFFLINE PROTOCOL"}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -291,6 +334,39 @@ export default function App() {
 
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-[10px] font-bold tracking-widest uppercase text-gray-500">System Resonance</h3>
+                  <Activity className="w-3 h-3 text-gray-500" />
+                </div>
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[9px] uppercase font-mono text-gray-400">
+                      <span>Neural Load</span>
+                      <span>{metrics.cpu}%</span>
+                    </div>
+                    <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                      <motion.div 
+                        className="h-full bg-nexus-accent shadow-[0_0_8px_rgba(0,240,255,0.5)]" 
+                        animate={{ width: `${metrics.cpu}%` }} 
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[9px] uppercase font-mono text-gray-400">
+                      <span>Synaptic Memory</span>
+                      <span>{metrics.memory}%</span>
+                    </div>
+                    <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                      <motion.div 
+                        className="h-full bg-nexus-accent" 
+                        animate={{ width: `${metrics.memory}%` }} 
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-4">
                   <h3 className="text-[10px] font-bold tracking-widest uppercase text-gray-500">Live Collaboration</h3>
                   <div className="flex gap-1">
                     <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
@@ -308,6 +384,19 @@ export default function App() {
                      </div>
                    ))}
                 </div>
+              </div>
+
+              <div className="mb-8">
+                 <button className="w-full p-3 rounded-lg bg-nexus-accent/10 border border-nexus-accent/20 flex items-center justify-between group hover:bg-nexus-accent/20 transition-all">
+                    <div className="flex items-center gap-2">
+                       <Zap className="w-4 h-4 text-nexus-accent group-hover:scale-110 transition-transform" />
+                       <div className="flex flex-col items-start">
+                          <span className="text-[10px] font-bold uppercase text-white">Neural Upgrade</span>
+                          <span className="text-[8px] text-nexus-accent/70 uppercase">v1.2 Available</span>
+                       </div>
+                    </div>
+                    <ChevronRight className="w-3 h-3 text-white/40" />
+                 </button>
               </div>
 
               <div className="mb-8">
