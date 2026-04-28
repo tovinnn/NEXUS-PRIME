@@ -1,0 +1,80 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User preferences and system state.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "preferences": {
+          "type": "object",
+          "properties": {
+            "theme": { "type": "string" },
+            "voiceEnabled": { "type": "boolean" },
+            "devMode": { "type": "boolean" }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId"]
+    },
+    "ChatSession": {
+      "title": "Chat Session",
+      "description": "A conversation thread.",
+      "type": "object",
+      "properties": {
+        "sessionId": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["sessionId", "userId"]
+    },
+    "ChatMessage": {
+      "title": "Chat Message",
+      "description": "An individual message in a session.",
+      "type": "object",
+      "properties": {
+        "messageId": { "type": "string" },
+        "sessionId": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "model"] },
+        "content": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "metadata": { "type": "object" }
+      },
+      "required": ["messageId", "sessionId", "role", "content"]
+    },
+    "Memory": {
+      "title": "AI Memory",
+      "description": "Persistent knowledge about the user extracted from interactions.",
+      "type": "object",
+      "properties": {
+        "memoryId": { "type": "string" },
+        "userId": { "type": "string" },
+        "fact": { "type": "string" },
+        "importance": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["memoryId", "userId", "fact"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User profiles and settings."
+    },
+    "sessions/{sessionId}": {
+      "schema": "ChatSession",
+      "description": "Conversation threads metadata."
+    },
+    "sessions/{sessionId}/messages/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Individual messages within a session."
+    },
+    "users/{userId}/memories/{memoryId}": {
+      "schema": "Memory",
+      "description": "AI-extracted facts and patterns about the user."
+    }
+  }
+}

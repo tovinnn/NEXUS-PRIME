@@ -1,0 +1,6 @@
+{
+  "name": "Nexus Prime AI",
+  "description": "The premium, self-adapting AI mastermind with conversational intelligence, memories, and developer-grade tools.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["AI Assistant", "Voice Interface", "Developer Tools", "Real-time Collaboration"]
+}

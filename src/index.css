@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-nexus-bg: #0A0A0C;
+  --color-nexus-border: rgba(255, 255, 255, 0.08);
+  --color-nexus-accent: #00F0FF;
+  --color-nexus-accent-glow: rgba(0, 240, 255, 0.3);
+  --color-nexus-surface: #151619;
+}
+
+@layer base {
+  body {
+    @apply bg-nexus-bg text-white font-sans antialiased min-h-screen;
+    background-image: 
+      linear-gradient(to bottom, rgba(10, 10, 12, 0.9), rgba(10, 10, 12, 0.98)),
+      url('https://images.squarespace-cdn.com/content/v1/5e7ce00569766c61556a31c0/1628108480373-Z6XUXW9B6XQZ6Z8Z8Z8Z/Rugrats+Couture+Chuckie+Boss.jpg?format=2500w');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+  }
+}
+
+.glass-panel {
+  @apply bg-nexus-bg/40 backdrop-blur-3xl border border-white/10;
+}
+
+.nexus-card {
+  @apply bg-nexus-surface/80 backdrop-blur-xl border border-nexus-border rounded-xl shadow-2xl;
+}
+
+.neon-border {
+  box-shadow: 0 0 15px var(--color-nexus-accent-glow);
+}
+
+.code-block {
+    @apply font-mono text-sm bg-black/40 p-4 rounded-lg border border-white/5 overflow-x-auto my-2;
+}
